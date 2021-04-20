@@ -1,5 +1,13 @@
 # MSP432-Motor-Speed
 
+## Note:
+
+I will finish write up later.
+
+## Demo:
+
+https://youtu.be/dAKCVJn_ZRc
+
 ## Calculations:
 
 ### Low-Pass Filter Transfer Function:
