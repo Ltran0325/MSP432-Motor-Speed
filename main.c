@@ -5,7 +5,7 @@
 * Device:  MSP432P401R LaunchPad                                               *
 * Program: Display encoder turn count on 7-segment display                     *
 *                                                                              *
-* Demo: https://youtu.be/3tQvZHvHI0I                                           *
+* Demo: https://youtu.be/6sq6xOPDv_o                                           *
 * refer to: https://github.com/Ltran0325/MSP432-Motor-Speed                    *
 *******************************************************************************/
 
