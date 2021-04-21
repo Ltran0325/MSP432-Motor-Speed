@@ -5,7 +5,7 @@
 * Device:  MSP432P401R LaunchPad                                               *
 * Program: Display encoder turn count on 7-segment display                     *
 *                                                                              *
-* Demo:                                                                        *
+* Demo: https://youtu.be/3tQvZHvHI0I                                           *
 * refer to: https://github.com/Ltran0325/MSP432-Motor-Speed                    *
 *******************************************************************************/
 
@@ -44,7 +44,7 @@ const uint8_t look_up[10] = { // 7-segment display look up table
 0b10010000,  // 9
 };
 
-uint8_t x0 = 0, y0 = 0, x1 = 0, y1 = 0;
+float x0 = 0, y0 = 0, x1 = 0, y1 = 0, temp = 0;
 volatile int16_t counter = 0;   // encoder angle counter
 volatile int16_t speed = 0;
 uint8_t display[4] = {0,0,0,0}; // 7-seg display array
@@ -63,23 +63,24 @@ void main(void)
     init_Timer_A0();
     init_Timer_A1();
 
-    uint32_t temp = 0;
-    uint8_t delay = 0;
+    uint16_t delay = 0;
 
     while(1){
 
-        if(delay == 00){
+        if(delay == 1000){
             delay = 0;
             temp = get_ADC();   //map 14-bit ADC to 75
             temp *= 75;
             temp /= 16384;
 
+            if (temp > 74){ temp = 74;} // motor stops if temp = 0 or 75
+            if(temp < 1){ temp = 1;}
             TIMER_A0->CCR[1] = temp;
             TIMER_A0->CCR[2] = 75-temp;
         }
         delay++;
 
-        sseg_modulo( abs(temp)%9999);
+        sseg_modulo(abs(speed));
         sseg_display();
     }
 
@@ -221,8 +222,14 @@ void sseg_display(void){
     k++;
     if (k >= 4){k = 0;}
 
+    if(speed >= 0){    /* Error?: Encoder is backwards*/
+        P5->OUT &= ~BIT0;   // red LED off, positive angle (CW)
+    }else{
+        P5->OUT |= BIT0;    // red LED on, negative angle (CCW)
+    }
+
     // reduce flickering
-    wait(1000);
+    wait(100);
 }
 
 void wait(uint32_t t){
@@ -250,7 +257,7 @@ void PORT3_IRQHandler(void){
     }
 }
 
-void TA1_0_IRQHandler(void){
+void TA1_0_IRQHandler(void){    // sampling freq = 200Hz
 
     // speed in RPM = (n*f*60)/N
     speed = counter*200*60/400;
