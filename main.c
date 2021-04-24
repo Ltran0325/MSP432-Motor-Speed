@@ -180,7 +180,7 @@ void init_Timer_A0(void){
 
     // Set TA0CCR1-2 as PWM output
     TIMER_A0->CCTL[1] |= TIMER_A_CCTLN_OUTMOD_6;    // Toggle-Set
-    TIMER_A0->CCTL[2] |= TIMER_A_CCTLN_OUTMOD_6;    //cToggle-Set
+    TIMER_A0->CCTL[2] |= TIMER_A_CCTLN_OUTMOD_6;    // Toggle-Set
 }
 
 void init_Timer_A1(void){
