@@ -3,7 +3,7 @@
 *                                                                              *
 * Author:  Long Tran                                                           *
 * Device:  MSP432P401R LaunchPad                                               *
-* Program: Display encoder turn count on 7-segment display                     *
+* Program: Display motor speed in RPM on 7-segment display                     *
 *                                                                              *
 * Demo: https://youtu.be/RyNKAnJRMWo                                           *
 * refer to: https://github.com/Ltran0325/MSP432-Motor-Speed                    *
