@@ -25,7 +25,7 @@ void init_Timer_A1(void);
 
 // display prototypes
 void sseg_modulo( uint16_t speed); // divide speed into digits using modulo operator
-void sseg_display(void);             // display counter digits on 7-segment display
+void sseg_display(void);           // display counter digits on 7-segment display
 void wait(uint32_t t);
 
 // ADC prototypes
@@ -63,22 +63,14 @@ void main(void)
     init_Timer_A0();
     init_Timer_A1();
 
-    uint16_t delay = 0;
-
     while(1){
 
-        if(delay == 1000){
-            delay = 0;
-            temp = get_ADC();   //map 14-bit ADC to 75
-            temp *= 75;
-            temp /= 16384;
+        temp = get_ADC();   //map 14-bit ADC to 75
+        temp *= 75;
+        temp /= 16384;
 
-            if (temp > 74){ temp = 74;} // motor stops if temp = 0 or 75
-            if(temp < 1){ temp = 1;}
-            TIMER_A0->CCR[1] = temp;
-            TIMER_A0->CCR[2] = 75-temp;
-        }
-        delay++;
+        TIMER_A0->CCR[1] = temp;
+        TIMER_A0->CCR[2] = 75-temp;
 
         sseg_modulo(abs(speed));
         sseg_display();
@@ -187,8 +179,8 @@ void init_Timer_A0(void){
     TIMER_A0->CCR[0] = 75;                     // CC register value
 
     // Set TA0CCR1-2 as PWM output
-    TIMER_A0->CCTL[1] |= TIMER_A_CCTLN_OUTMOD_2;
-    TIMER_A0->CCTL[2] |= TIMER_A_CCTLN_OUTMOD_2;
+    TIMER_A0->CCTL[1] |= TIMER_A_CCTLN_OUTMOD_6;    // Toggle-Set
+    TIMER_A0->CCTL[2] |= TIMER_A_CCTLN_OUTMOD_6;    //cToggle-Set
 }
 
 void init_Timer_A1(void){
@@ -198,15 +190,23 @@ void init_Timer_A1(void){
 
     TIMER_A1->CCTL[0] &= ~TIMER_A_CCTLN_CCIFG; // clear CC interrupt flag
     TIMER_A1->CCTL[0] |= TIMER_A_CCTLN_CCIE;   // enable CC interrupt
-    TIMER_A1->CCR[0] = 1875;                     // CC register value
+    TIMER_A1->CCR[0] = 1875;                   // CC register value
 
 }
 void sseg_modulo( uint16_t speed){
 
-    display[0] = speed/1000;
-    display[1] = (speed/100)%10;
-    display[2] = (speed/10)%10;
-    display[3] = speed%10;
+    static uint16_t delay = 0;  // slow down display readings (no flickering)
+
+    if(delay == 1000){
+        delay = 0;
+        display[0] = speed/1000;
+        display[1] = (speed/100)%10;
+        display[2] = (speed/10)%10;
+        display[3] = speed%10;
+    }else{
+        delay++;
+    }
+
 }
 
 void sseg_display(void){
@@ -243,7 +243,7 @@ uint32_t get_ADC(void){
 
     while(ADC14->CTL0 & BIT(16));   // ADC14BUSY, wait while ADC14 is busy
 
-    return ADC14->MEM[0];     // get ADC14 result
+    return ADC14->MEM[0];           // get ADC14 result
 }
 
 //-- Interrupts
