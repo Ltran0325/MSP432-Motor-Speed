@@ -1,8 +1,8 @@
 # MSP432-Motor-Speed
 
-## Note:
+## Description:
 
-I will finish write up later.
+Control motor speed using a potentiometer. Potentiometer voltage readings are passed through a digital low pass filter to smoothen speed transitions. Speed in RPM is displayed on a seven-segment display.
 
 ## Demo:
 
